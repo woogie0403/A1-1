@@ -49,3 +49,16 @@ cd prompt-manager
 ```bash
 python main.py
 ```
+
+---
+
+## 📸 과제 수행 증빙 스크린샷
+
+### 1. 개발 환경 설정
+![환경설정](screenshots/1_env.png)
+
+### 2. 프로그램 실행 결과
+![실행결과](screenshots/2_execution.png)
+
+### 3. Git Graph (브랜치 및 커밋 이력)
+![깃그래프](screenshots/3_git_graph.png)
