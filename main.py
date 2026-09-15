@@ -136,7 +136,6 @@ def manage_favorite():
     idx = int(num_str) - 1
     p = prompts[idx]
 
-    # 즐겨찾기 상태 반전 (True <-> False)
     p["favorite"] = not p.get("favorite", False)
 
     if p["favorite"]:
@@ -160,6 +159,37 @@ def show_favorites():
     print(f"총 {len(fav_list)}개의 즐겨찾기")
 
 
+def filter_by_category():
+    """카테고리별 프롬프트 조회 함수"""
+    print("\n=== 카테고리별 조회 ===")
+    print("카테고리 선택:")
+    for idx, cat in enumerate(CATEGORIES, 1):
+        print(f"{idx}) {cat}")
+
+    choice = input("선택 (번호 1~6 또는 직접 입력): ").strip()
+    if not choice:
+        print("[오류] 카테고리를 입력해주세요.")
+        return
+
+    if choice.isdigit() and 1 <= int(choice) <= len(CATEGORIES):
+        target_cat = CATEGORIES[int(choice) - 1]
+    else:
+        target_cat = choice
+
+    filtered = [p for p in prompts if p.get("category") == target_cat]
+
+    print(f"\n[{target_cat}] 카테고리 프롬프트:")
+    if not filtered:
+        print("해당 카테고리에 등록된 프롬프트가 없습니다.")
+        return
+
+    for idx, p in enumerate(filtered, 1):
+        fav_mark = "☆" if p.get("favorite") else ""
+        print(f"{idx}. {p['title']}{fav_mark}")
+
+    print(f"총 {len(filtered)}개의 프롬프트")
+
+
 def main():
     """프로그램 메인 루프"""
     while True:
@@ -171,7 +201,7 @@ def main():
         elif choice == "2":
             show_list()
         elif choice == "3":
-            print("\n[안내] 카테고리별 조회 기능은 다음 단계에서 구현됩니다.")
+            filter_by_category()
         elif choice == "4":
             print("\n[안내] 프롬프트 검색 기능은 다음 단계에서 구현됩니다.")
         elif choice == "5":
