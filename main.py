@@ -1,7 +1,12 @@
+import json
+import os
+
 # -------------------------------------------------------------
-# 기본 프롬프트 데이터
+# 파일 경로 및 기본 프롬프트 데이터
 # -------------------------------------------------------------
-prompts = [
+DATA_FILE = "prompts.json"
+
+DEFAULT_PROMPTS = [
     {
         "title": "블로그 글 작성 도우미",
         "content": "당신은 10년 경력의 전문 블로거입니다. 주어진 주제에 대해 SEO에 최적화된 블로그 글을 작성해주세요. 서론, 본론, 결론 구조를 갖추고 매력적인 제목을 제안해주세요.",
@@ -25,6 +30,30 @@ prompts = [
 CATEGORIES = ["텍스트 생성", "이미지 생성", "영상 생성", "페르소나", "자동화", "기타"]
 
 
+def load_prompts():
+    """JSON 파일에서 프롬프트 불러오기 (없으면 기본 데이터 반환)"""
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                print(f"[안내] '{DATA_FILE}' 파일에서 {len(data)}개의 프롬프트를 불러왔습니다.")
+                return data
+        except Exception as e:
+            print(f"[경고] 파일 불러오기 실패: {e}")
+    # 파일이 없는 경우 기본 데이터 사용
+    return list(DEFAULT_PROMPTS)
+
+
+def save_prompts(prompts_list):
+    """프롬프트 데이터를 JSON 파일로 저장하기"""
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(prompts_list, f, ensure_ascii=False, indent=4)
+        print(f"[성공] 프롬프트 데이터가 '{DATA_FILE}' 파일에 안전하게 저장되었습니다.")
+    except Exception as e:
+        print(f"[오류] 저장 실패: {e}")
+
+
 def show_menu():
     """메인 메뉴 출력 함수"""
     print("\n" + "=" * 25)
@@ -37,11 +66,12 @@ def show_menu():
     print("5. 프롬프트 상세 보기")
     print("6. 즐겨찾기 관리")
     print("7. 즐겨찾기 목록")
+    print("8. JSON 파일로 저장")
     print("0. 종료")
     print("=" * 25)
 
 
-def add_prompt():
+def add_prompt(prompts):
     """새로운 프롬프트 등록 함수"""
     print("\n=== 프롬프트 추가 ===")
 
@@ -82,9 +112,11 @@ def add_prompt():
     }
     prompts.append(new_prompt)
     print("\n프롬프트가 성공적으로 추가되었습니다!")
+    # 데이터 변경 시 자동 저장
+    save_prompts(prompts)
 
 
-def show_list():
+def show_list(prompts):
     """저장된 모든 프롬프트 목록 출력 함수"""
     print("\n=== 프롬프트 목록 ===")
     if not prompts:
@@ -98,7 +130,7 @@ def show_list():
     print(f"총 {len(prompts)}개의 프롬프트")
 
 
-def show_detail():
+def show_detail(prompts):
     """프롬프트 상세 내용 보기 함수"""
     print("\n=== 프롬프트 상세 보기 ===")
     if not prompts:
@@ -121,7 +153,7 @@ def show_detail():
     print(p['content'])
 
 
-def manage_favorite():
+def manage_favorite(prompts):
     """즐겨찾기 추가/해제 토글 함수"""
     print("\n=== 즐겨찾기 관리 ===")
     if not prompts:
@@ -143,8 +175,11 @@ def manage_favorite():
     else:
         print(f"'{p['title']}' 프롬프트를 즐겨찾기에서 해제했습니다.")
 
+    # 즐겨찾기 변경 시 자동 저장
+    save_prompts(prompts)
 
-def show_favorites():
+
+def show_favorites(prompts):
     """즐겨찾기된 프롬프트만 출력하는 함수"""
     print("\n=== 즐겨찾기 목록 ===")
     fav_list = [p for p in prompts if p.get("favorite")]
@@ -159,7 +194,7 @@ def show_favorites():
     print(f"총 {len(fav_list)}개의 즐겨찾기")
 
 
-def filter_by_category():
+def filter_by_category(prompts):
     """카테고리별 프롬프트 조회 함수"""
     print("\n=== 카테고리별 조회 ===")
     print("카테고리 선택:")
@@ -190,7 +225,7 @@ def filter_by_category():
     print(f"총 {len(filtered)}개의 프롬프트")
 
 
-def search_prompt():
+def search_prompt(prompts):
     """키워드로 제목 또는 내용 검색 함수"""
     print("\n=== 프롬프트 검색 ===")
     if not prompts:
@@ -202,7 +237,6 @@ def search_prompt():
         print("[오류] 검색어를 입력해주세요.")
         return
 
-    # 대소문자 무시 검색
     results = [
         p for p in prompts
         if keyword.lower() in p["title"].lower() or keyword.lower() in p["content"].lower()
@@ -222,29 +256,36 @@ def search_prompt():
 
 def main():
     """프로그램 메인 루프"""
+    # 프로그램 시작 시 파일에서 데이터 로드
+    prompts = load_prompts()
+
     while True:
         show_menu()
         choice = input("선택: ").strip()
 
         if choice == "1":
-            add_prompt()
+            add_prompt(prompts)
         elif choice == "2":
-            show_list()
+            show_list(prompts)
         elif choice == "3":
-            filter_by_category()
+            filter_by_category(prompts)
         elif choice == "4":
-            search_prompt()
+            search_prompt(prompts)
         elif choice == "5":
-            show_detail()
+            show_detail(prompts)
         elif choice == "6":
-            manage_favorite()
+            manage_favorite(prompts)
         elif choice == "7":
-            show_favorites()
+            show_favorites(prompts)
+        elif choice == "8":
+            save_prompts(prompts)
         elif choice == "0":
+            # 종료 시 한 번 더 안전하게 저장
+            save_prompts(prompts)
             print("\n프로그램을 종료합니다. 이용해주셔서 감사합니다!")
             break
         else:
-            print("\n[오류] 올바른 번호를 입력해주세요 (0~7).")
+            print("\n[오류] 올바른 번호를 입력해주세요 (0~8).")
 
 
 if __name__ == "__main__":
