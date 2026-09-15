@@ -64,3 +64,6 @@ python main.py
 
 ### 3. Git Graph (브랜치 및 커밋 이력)
 ![깃그래프](screenshots/3_git_graph.png)
+
+### 4. 보너스 과제 실행 결과 (JSON 영속화 및 Markdown 내보내기)
+![보너스과제](screenshots/4_bonus.png)
