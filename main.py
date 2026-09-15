@@ -121,6 +121,45 @@ def show_detail():
     print(p['content'])
 
 
+def manage_favorite():
+    """즐겨찾기 추가/해제 토글 함수"""
+    print("\n=== 즐겨찾기 관리 ===")
+    if not prompts:
+        print("등록된 프롬프트가 없습니다.")
+        return
+
+    num_str = input("프롬프트 번호 입력: ").strip()
+    if not num_str.isdigit() or not (1 <= int(num_str) <= len(prompts)):
+        print("[오류] 유효한 프롬프트 번호를 입력해주세요.")
+        return
+
+    idx = int(num_str) - 1
+    p = prompts[idx]
+
+    # 즐겨찾기 상태 반전 (True <-> False)
+    p["favorite"] = not p.get("favorite", False)
+
+    if p["favorite"]:
+        print(f"'{p['title']}' 프롬프트를 즐겨찾기에 추가했습니다! ☆")
+    else:
+        print(f"'{p['title']}' 프롬프트를 즐겨찾기에서 해제했습니다.")
+
+
+def show_favorites():
+    """즐겨찾기된 프롬프트만 출력하는 함수"""
+    print("\n=== 즐겨찾기 목록 ===")
+    fav_list = [p for p in prompts if p.get("favorite")]
+
+    if not fav_list:
+        print("즐겨찾기로 등록된 프롬프트가 없습니다.")
+        return
+
+    for idx, p in enumerate(fav_list, 1):
+        print(f"{idx}. [{p['category']}] {p['title']}☆")
+
+    print(f"총 {len(fav_list)}개의 즐겨찾기")
+
+
 def main():
     """프로그램 메인 루프"""
     while True:
@@ -138,9 +177,9 @@ def main():
         elif choice == "5":
             show_detail()
         elif choice == "6":
-            print("\n[안내] 즐겨찾기 관리 기능은 다음 단계에서 구현됩니다.")
+            manage_favorite()
         elif choice == "7":
-            print("\n[안내] 즐겨찾기 목록 기능은 다음 단계에서 구현됩니다.")
+            show_favorites()
         elif choice == "0":
             print("\n프로그램을 종료합니다. 이용해주셔서 감사합니다!")
             break
