@@ -85,18 +85,40 @@ def add_prompt():
 
 
 def show_list():
-    """저장된 모든 프롬프트 목록 출력 함수 (브랜치 미션)"""
+    """저장된 모든 프롬프트 목록 출력 함수"""
     print("\n=== 프롬프트 목록 ===")
     if not prompts:
         print("등록된 프롬프트가 없습니다.")
         return
 
     for idx, p in enumerate(prompts, 1):
-        # 즐겨찾기(favorite)가 True이면 ☆ 표시
         fav_mark = "☆" if p.get("favorite") else ""
         print(f"{idx}. [{p['category']}] {p['title']}{fav_mark}")
 
     print(f"총 {len(prompts)}개의 프롬프트")
+
+
+def show_detail():
+    """프롬프트 상세 내용 보기 함수"""
+    print("\n=== 프롬프트 상세 보기 ===")
+    if not prompts:
+        print("등록된 프롬프트가 없습니다.")
+        return
+
+    num_str = input("번호 입력: ").strip()
+    if not num_str.isdigit() or not (1 <= int(num_str) <= len(prompts)):
+        print("[오류] 유효한 프롬프트 번호를 입력해주세요.")
+        return
+
+    idx = int(num_str) - 1
+    p = prompts[idx]
+    fav_mark = "☆" if p.get("favorite") else "없음"
+
+    print(f"\n제목: {p['title']}")
+    print(f"카테고리: {p['category']}")
+    print(f"즐겨찾기: {fav_mark}")
+    print("내용:")
+    print(p['content'])
 
 
 def main():
@@ -114,7 +136,7 @@ def main():
         elif choice == "4":
             print("\n[안내] 프롬프트 검색 기능은 다음 단계에서 구현됩니다.")
         elif choice == "5":
-            print("\n[안내] 프롬프트 상세 보기 기능은 다음 단계에서 구현됩니다.")
+            show_detail()
         elif choice == "6":
             print("\n[안내] 즐겨찾기 관리 기능은 다음 단계에서 구현됩니다.")
         elif choice == "7":
