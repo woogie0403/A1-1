@@ -5,6 +5,7 @@ import os
 # 파일 경로 및 기본 프롬프트 데이터
 # -------------------------------------------------------------
 DATA_FILE = "prompts.json"
+EXPORT_MD_FILE = "prompts_by_category.md"
 
 DEFAULT_PROMPTS = [
     {
@@ -40,7 +41,6 @@ def load_prompts():
                 return data
         except Exception as e:
             print(f"[경고] 파일 불러오기 실패: {e}")
-    # 파일이 없는 경우 기본 데이터 사용
     return list(DEFAULT_PROMPTS)
 
 
@@ -52,6 +52,41 @@ def save_prompts(prompts_list):
         print(f"[성공] 프롬프트 데이터가 '{DATA_FILE}' 파일에 안전하게 저장되었습니다.")
     except Exception as e:
         print(f"[오류] 저장 실패: {e}")
+
+
+def export_to_markdown(prompts):
+    """전체 프롬프트를 카테고리별 Markdown 파일로 내보내기 (보너스 과제)"""
+    print("\n=== Markdown 파일로 내보내기 ===")
+    if not prompts:
+        print("내보낼 프롬프트가 없습니다.")
+        return
+
+    # 1. 카테고리별로 프롬프트 묶기(그룹화)
+    grouped = {}
+    for p in prompts:
+        cat = p.get("category", "기타")
+        if cat not in grouped:
+            grouped[cat] = []
+        grouped[cat].append(p)
+
+    # 2. 마크다운 파일 작성
+    try:
+        with open(EXPORT_MD_FILE, "w", encoding="utf-8") as f:
+            f.write("# 📚 나만의 프롬프트 모음집 (카테고리별)\n\n")
+            f.write("> 이 문서는 프롬프트 관리 프로그램에서 자동으로 추출(Export)된 파일입니다.\n\n")
+
+            for cat, items in grouped.items():
+                f.write(f"## 📁 {cat} ({len(items)}개)\n\n")
+                for idx, p in enumerate(items, 1):
+                    fav_mark = " (★ 즐겨찾기)" if p.get("favorite") else ""
+                    f.write(f"### {idx}. {p['title']}{fav_mark}\n\n")
+                    f.write("```text\n")
+                    f.write(f"{p['content']}\n")
+                    f.write("```\n\n")
+
+        print(f"[성공] 모든 프롬프트가 '{EXPORT_MD_FILE}' 파일로 성공적으로 내보내졌습니다!")
+    except Exception as e:
+        print(f"[오류] 내보내기 실패: {e}")
 
 
 def show_menu():
@@ -67,6 +102,7 @@ def show_menu():
     print("6. 즐겨찾기 관리")
     print("7. 즐겨찾기 목록")
     print("8. JSON 파일로 저장")
+    print("9. Markdown 파일로 내보내기")
     print("0. 종료")
     print("=" * 25)
 
@@ -112,7 +148,6 @@ def add_prompt(prompts):
     }
     prompts.append(new_prompt)
     print("\n프롬프트가 성공적으로 추가되었습니다!")
-    # 데이터 변경 시 자동 저장
     save_prompts(prompts)
 
 
@@ -175,7 +210,6 @@ def manage_favorite(prompts):
     else:
         print(f"'{p['title']}' 프롬프트를 즐겨찾기에서 해제했습니다.")
 
-    # 즐겨찾기 변경 시 자동 저장
     save_prompts(prompts)
 
 
@@ -256,7 +290,6 @@ def search_prompt(prompts):
 
 def main():
     """프로그램 메인 루프"""
-    # 프로그램 시작 시 파일에서 데이터 로드
     prompts = load_prompts()
 
     while True:
@@ -279,13 +312,14 @@ def main():
             show_favorites(prompts)
         elif choice == "8":
             save_prompts(prompts)
+        elif choice == "9":
+            export_to_markdown(prompts)
         elif choice == "0":
-            # 종료 시 한 번 더 안전하게 저장
             save_prompts(prompts)
             print("\n프로그램을 종료합니다. 이용해주셔서 감사합니다!")
             break
         else:
-            print("\n[오류] 올바른 번호를 입력해주세요 (0~8).")
+            print("\n[오류] 올바른 번호를 입력해주세요 (0~9).")
 
 
 if __name__ == "__main__":
