@@ -45,21 +45,18 @@ def add_prompt():
     """새로운 프롬프트 등록 함수"""
     print("\n=== 프롬프트 추가 ===")
 
-    # 1. 제목 입력 및 비어있는지 검증
     while True:
         title = input("제목: ").strip()
         if title:
             break
         print("[오류] 제목은 비워둘 수 없습니다. 다시 입력해주세요.")
 
-    # 2. 내용 입력 및 비어있는지 검증
     while True:
         content = input("내용: ").strip()
         if content:
             break
         print("[오류] 내용은 비워둘 수 없습니다. 다시 입력해주세요.")
 
-    # 3. 카테고리 선택 또는 직접 입력
     print("\n카테고리 선택:")
     for idx, cat in enumerate(CATEGORIES, 1):
         print(f"{idx}) {cat}")
@@ -74,11 +71,9 @@ def add_prompt():
             category = CATEGORIES[int(cat_choice) - 1]
             break
         else:
-            # 직접 텍스트로 카테고리를 입력한 경우
             category = cat_choice
             break
 
-    # 4. 프롬프트 데이터 딕셔너리 생성 및 리스트 추가 (즐겨찾기 기본값: False)
     new_prompt = {
         "title": title,
         "content": content,
@@ -87,6 +82,21 @@ def add_prompt():
     }
     prompts.append(new_prompt)
     print("\n프롬프트가 성공적으로 추가되었습니다!")
+
+
+def show_list():
+    """저장된 모든 프롬프트 목록 출력 함수 (브랜치 미션)"""
+    print("\n=== 프롬프트 목록 ===")
+    if not prompts:
+        print("등록된 프롬프트가 없습니다.")
+        return
+
+    for idx, p in enumerate(prompts, 1):
+        # 즐겨찾기(favorite)가 True이면 ☆ 표시
+        fav_mark = "☆" if p.get("favorite") else ""
+        print(f"{idx}. [{p['category']}] {p['title']}{fav_mark}")
+
+    print(f"총 {len(prompts)}개의 프롬프트")
 
 
 def main():
@@ -98,7 +108,7 @@ def main():
         if choice == "1":
             add_prompt()
         elif choice == "2":
-            print("\n[안내] 프롬프트 목록 기능은 다음 단계(브랜치 미션)에서 구현됩니다.")
+            show_list()
         elif choice == "3":
             print("\n[안내] 카테고리별 조회 기능은 다음 단계에서 구현됩니다.")
         elif choice == "4":
